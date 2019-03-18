@@ -15,6 +15,13 @@ export class Docker {
 		await execSync("docker pull ethereum/solc:" + this.env.config.solc.version);
 	}
 
+	public async validateDockerImageVersion() {
+		const semver = require('semver')
+		if (!semver.valid(this.env.config.solc.version)) {
+      throw new BuidlerPluginError("The Docker Image version you have provided is not valid");
+    }
+	}
+
 	private getExecSync() {
 		const execSync = require("child_process");
 		try {
