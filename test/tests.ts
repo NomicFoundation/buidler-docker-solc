@@ -1,7 +1,7 @@
+import { TASK_COMPILE_RUN_COMPILER } from "@nomiclabs/buidler/builtin-tasks/task-names";
+import { BuidlerPluginError } from "@nomiclabs/buidler/plugins";
 import { BuidlerRuntimeEnvironment } from "@nomiclabs/buidler/types";
 import { assert } from "chai";
-
-import { ExampleBuidlerRuntimeEnvironmentField } from "../src/index";
 
 declare module "mocha" {
   interface Context {
@@ -9,7 +9,7 @@ declare module "mocha" {
   }
 }
 
-describe("BuidlerRuntimeEnvironment extension", function() {
+describe("buidler-docker-solc plugin", function() {
   beforeEach("Buidler project setup", function() {
     process.chdir(__dirname + "/buidler-project");
     process.env.BUIDLER_NETWORK = "develop";
@@ -20,11 +20,19 @@ describe("BuidlerRuntimeEnvironment extension", function() {
     this.env = require("@nomiclabs/buidler");
   });
 
-  it("It should add the example field", function() {
+  it("BuidlerPluginError should be thrown if no docker image is available", async function() {
+    try {
+      await this.env.run(TASK_COMPILE_RUN_COMPILER);
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
+  /*it("It should add the example field", function() {
     assert.instanceOf(this.env.example, ExampleBuidlerRuntimeEnvironmentField);
   });
 
   it("The example filed should say hello", function() {
     assert.equal(this.env.example.sayHello(), "hello");
-  });
+  });*/
 });

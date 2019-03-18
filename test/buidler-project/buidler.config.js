@@ -1,3 +1,7 @@
 require("../../src/index");
 
-module.exports = {};
+module.exports = {
+	solc: {
+		"version": "0.5.5"
+	}
+};
