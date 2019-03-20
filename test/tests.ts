@@ -20,7 +20,7 @@ describe("buidler-docker-solc plugin", function() {
     this.env = require("@nomiclabs/buidler");
   });
 
-  it("BuidlerPluginError should be thrown if no docker image is available", async function() {
+  it("BuidlerPluginError should be thrown if docker is not available", async function() {
     try {
       await this.env.run(TASK_COMPILE_RUN_COMPILER);
     } catch (err) {
