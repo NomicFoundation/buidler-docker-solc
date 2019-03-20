@@ -24,7 +24,7 @@ export class Docker {
     	},
     	AttachStdin: true,
       AttachStdout: true,
-    	Image: "ethereum/solc" + this.env.config.solc.version,
+    	Image: "ethereum/solc:" + this.env.config.solc.version,
     	Cmd: [ "--standard-json" ]
 		}, input);
 	}
@@ -35,9 +35,17 @@ export class Docker {
       throw new BuidlerPluginError("The Docker Image version you have provided is not valid");
     }
 
-    await this.docker.image.create({}, { fromImage: 'ethereum/solc', tag: this.env.config.solc.version })
-		  .catch((error: any) => {
-		  	throw new BuidlerPluginError("Docker image ethereum/solc:" + this.env.config.solc.version + " not found");
-	  	});
+    const promisifyStream = (stream: any) => new Promise((resolve, reject) => {
+		  stream.on('data', (d: any) => console.log(d.toString()))
+		  stream.on('end', resolve)
+		  stream.on('error', reject)
+		})
+
+    try {
+	    await this.docker.image.create({}, { fromImage: 'ethereum/solc', tag: this.env.config.solc.version })
+		    .then((stream: any) => promisifyStream(stream))
+			} catch (err) {
+					throw new BuidlerPluginError("Docker image ethereum/solc:" + this.env.config.solc.version + " not found");
+			}
 	}
 }
