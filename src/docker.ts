@@ -11,10 +11,20 @@ export class Docker {
 		this.env = require("@nomiclabs/buidler");
 	}
 
-	async load() {
+	public async compile(input: any) {
 		await this.validateAndPullDockerImage();
-		this.docker.image.create({}, { fromImage: 'ethereum/solc', tag: this.env.config.solc.version })
-  		.then(() => this.docker.image.get('ubuntu').status())
+		var appRoot = require('app-root-path');
+		return await this.docker.container.create({
+			HostConfig: {
+        Binds: [appRoot + "/contracts:" + appRoot + "/contracts"] // Bind contracts to container
+    	},
+    	AttachStdin: true,
+      AttachStdout: true,
+    	Image: "ethereum/solc" + this.env.config.solc.version,
+    	Cmd: [ "--standard-json" ]
+		}, input);
+  		// Run with --standard-json
+  		// docker run -v ~/solidity:/solidity ethereum/solc:<TAG> --standard-json /solidity/contracts/<yoursoliditycontract>.sol
 	}
 
 	async validateAndPullDockerImage() {
