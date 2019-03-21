@@ -1,5 +1,4 @@
 import { TASK_COMPILE_RUN_COMPILER } from "@nomiclabs/buidler/builtin-tasks/task-names";
-import { BuidlerPluginError } from "@nomiclabs/buidler/plugins";
 import { BuidlerRuntimeEnvironment } from "@nomiclabs/buidler/types";
 import { assert } from "chai";
 
@@ -20,19 +19,43 @@ describe("buidler-docker-solc plugin", function() {
     this.env = require("@nomiclabs/buidler");
   });
 
-  it("BuidlerPluginError should be thrown if docker is not available", async function() {
+  it("Task should run successfully", async function() {
     try {
-      await this.env.run(TASK_COMPILE_RUN_COMPILER);
+      this.timeout(10000);
+      const results = await this.env.run(TASK_COMPILE_RUN_COMPILER, {
+        input: {
+          language: "Solidity",
+          sources: {
+            contracts: {
+              content: "pragma solidity^0.5.6;\n\ncontract C {\n\n}\n"
+            }
+          },
+          settings: {
+            outputSelection: {
+              "*": {
+                "*": ["*"]
+              }
+            }
+          }
+        }
+      });
+      assert(results);
     } catch (err) {
       console.log(err);
     }
   });
 
-  /*it("It should add the example field", function() {
-    assert.instanceOf(this.env.example, ExampleBuidlerRuntimeEnvironmentField);
+  it("Should throw docker image is not valid", async function() {
+    this.env.config.solc.version = "Not an image";
+    try {
+      await this.env.run(TASK_COMPILE_RUN_COMPILER);
+      // If this passes, something is wrong
+      assert(false);
+    } catch (err) {
+      assert.equal(
+        err.message,
+        "The Docker Image version you have provided is not valid"
+      );
+    }
   });
-
-  it("The example filed should say hello", function() {
-    assert.equal(this.env.example.sayHello(), "hello");
-  });*/
 });
