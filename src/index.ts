@@ -6,7 +6,7 @@ import { Docker } from "./docker";
 
 internalTask(TASK_COMPILE_RUN_COMPILER).setAction(
   async ({ input }: { input: SolcInput }, { config }) => {
-    const dockerExec = new Docker(config);
+    const dockerExec = new Docker(config.solc);
     return dockerExec.compile(input);
   }
 );

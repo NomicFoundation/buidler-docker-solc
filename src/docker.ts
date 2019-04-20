@@ -1,28 +1,28 @@
 import { BuidlerPluginError } from "@nomiclabs/buidler/plugins";
+import { SolcConfig, SolcInput } from "@nomiclabs/buidler/types";
 
 export class Docker {
-  private env: any;
+  private solcConfig: SolcConfig;
 
-  constructor(private readonly config: any) {
-    this.env = require("@nomiclabs/buidler");
+  constructor(private readonly config: SolcConfig) {
+    this.solcConfig = config;
   }
 
-  public async compile(solcInput: any) {
+  public async compile(solcInput: SolcInput) {
     const { execSync } = require("child_process");
     await this.validateAndPullDockerImage();
     try {
       const command =
-        "echo '" +
+        "echo '''" +
         JSON.stringify(solcInput) +
-        "' | docker run -i ethereum/solc:" +
-        this.env.config.solc.version +
+        "''' | docker run -i ethereum/solc:" +
+        this.solcConfig.version +
         " --standard-json";
       const buffer = await execSync(command);
       return buffer.toString();
     } catch (err) {
       throw new BuidlerPluginError(
-        "Error running Docker image ethereum/solc:" +
-          this.env.config.solc.version
+        "Error running Docker image ethereum/solc:" + this.solcConfig.version
       );
     }
   }
@@ -36,21 +36,17 @@ export class Docker {
     }
 
     const semver = require("semver");
-    if (!semver.valid(this.env.config.solc.version)) {
+    if (!semver.valid(this.solcConfig.version)) {
       throw new BuidlerPluginError(
         "The Docker Image version you have provided is not valid"
       );
     }
 
     try {
-      await execSync(
-        "docker pull ethereum/solc:" + this.env.config.solc.version
-      );
+      await execSync("docker pull ethereum/solc:" + this.solcConfig.version);
     } catch (err) {
       throw new BuidlerPluginError(
-        "Docker image ethereum/solc:" +
-          this.env.config.solc.version +
-          " not found"
+        "Docker image ethereum/solc:" + this.solcConfig.version + " not found"
       );
     }
   }
